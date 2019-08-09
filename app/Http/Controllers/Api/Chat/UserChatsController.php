@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api\Chat;
 
 use App\Models\Chat;
 use App\Models\User;
+use App\Models\Group;
 use Illuminate\Http\Request;
 use App\Transformers\ChatTransformer;
 use App\Http\Controllers\Api\Controller;
+use Illuminate\Database\Eloquent\Builder;
 
 class UserChatsController extends Controller
 {
@@ -22,13 +24,22 @@ class UserChatsController extends Controller
         $user = $request->user();
 
         $chats = Chat::query()
-            ->where(function ($query) use ($user) {
+            ->where(function (Builder $query) use ($user) {
                 $query->where('sender_id', $user->id)
-                    ->orWhere('receiver_id', $user->id);
+                    ->orWhereHasMorph(
+                        'receivable',
+                        Group::class,
+                        function (Builder $query) use ($user) {
+                            $query->whereHas('users', function (Builder $query) use ($user) {
+                                $query->where('user_id', $user->id);
+                            });
+                        }
+                    );
             })
-            ->recentEachGroup(['sender_id', 'receiver_id'])
-            ->with('sender', 'receiver')
-            ->latest();
+            ->recentEachGroup(['sender_id', 'receivable_id', 'receivable_type'])
+            ->with('sender', 'receivable')
+            ->latest()
+            ->orderByDesc('chats.id');
 
         $chats = $this->preprocessResource($chats, ChatTransformer::class);
 
@@ -36,30 +47,61 @@ class UserChatsController extends Controller
     }
 
     /**
-     * Display chat history with the given sender.
+     * Display chat history on the given receivable.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\User  $sender
+     * @param  string  $receivableType
+     * @param  int  $receivable
      * @return mixed
      */
-    public function withSender(Request $request, User $sender)
+    public function withReceivable(Request $request, $receivableType, $receivable)
     {
         /** @var \App\Models\User $user */
         $user = $request->user();
 
-        $chats = Chat::query()
-            ->where(function ($query) use ($user, $sender) {
-                $query->where('sender_id', $sender->id)
-                    ->where('receiver_id', $user->id);
-            })
-            ->orWhere(function ($query) use ($user, $sender) {
-                $query->where('sender_id', $user->id)
-                    ->where('receiver_id', $sender->id);
-            })
-            ->latest()
-            ->with('sender', 'receiver');
+        if (! in_array($receivableType, ['users', 'groups'])) {
+            abort(404);
+        }
 
-        $chats = $this->preprocessResource($chats, ChatTransformer::class);
+        $isGroup = $receivableType === 'groups';
+
+        if ($isGroup) {
+            $receivable = Group::findOrFail($receivable);
+
+            $query = Chat::query()
+                ->where(function (Builder $query) use ($user, $receivable) {
+                    $query->whereHasMorph(
+                        'receivable',
+                        get_class($receivable),
+                        function (Builder $query) use ($user) {
+                            $query->whereHas('users', function (Builder $query) use ($user) {
+                                $query->where('user_id', $user->id);
+                            });
+                        }
+                    )
+                    ->where('receivable_id', $receivable->id);
+                });
+        } else {
+            $receivable = User::where('id', '!=', $user->id)->findOrFail($receivable);
+
+            $query = Chat::query()
+                ->where(function (Builder $query) use ($user, $receivable) {
+                    $query->where('sender_id', $user->id)
+                        ->whereHasMorph('receivable', get_class($receivable))
+                        ->where('receivable_id', $receivable->id);
+                })
+                ->orWhere(function (Builder $query) use ($user, $receivable) {
+                    $query->where('sender_id', $receivable->id)
+                        ->whereHasMorph('receivable', get_class($receivable))
+                        ->where('receivable_id', $user->id);
+                });
+        }
+
+        $query = $query->latest()
+            ->orderByDesc('chats.id')
+            ->with('sender', 'receivable');
+
+        $chats = $this->preprocessResource($query, ChatTransformer::class);
 
         return ChatTransformer::collection($chats->paginate());
     }

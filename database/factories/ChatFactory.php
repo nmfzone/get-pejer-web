@@ -3,6 +3,7 @@
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 use App\Models\Chat;
 use App\Models\User;
+use App\Models\Group;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
@@ -18,12 +19,24 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 */
 
 $factory->define(Chat::class, function (Faker $faker) {
+    $isToGroup = $faker->boolean(30);
     $sender = User::inRandomOrder()->first();
-    $receiver = User::where('id', '!=', $sender->id)->inRandomOrder()->first();
+
+    if ($isToGroup) {
+        $receivable = Group::inRandomOrder()->first();
+
+        // Attach user to the group.
+        if (! $receivable->users()->find($sender->id)) {
+            $receivable->users()->save($sender);
+        }
+    } else {
+        $receivable = User::where('id', '!=', $sender->id)->inRandomOrder()->first();
+    }
 
     return [
         'message' => $faker->text,
         'sender_id' => $sender->id,
-        'receiver_id' => $receiver->id,
+        'receivable_id' => $receivable->id,
+        'receivable_type' => Relation::getClassNameAliasForMorph($receivable),
     ];
 });

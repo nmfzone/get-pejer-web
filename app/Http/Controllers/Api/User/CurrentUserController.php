@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\User;
 
 use Illuminate\Http\Request;
+use App\Transformers\UserTransformer;
 use App\Http\Controllers\Api\Controller;
 
 class CurrentUserController extends Controller
@@ -17,6 +18,6 @@ class CurrentUserController extends Controller
     {
         $user = $request->user();
 
-        return $user;
+        return UserTransformer::make($user);
     }
 }

@@ -2,17 +2,23 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Chatable;
+use App\Models\Concerns\Tokenable;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use Notifiable,
+    use Chatable,
+        Tokenable,
+        Notifiable,
         SoftDeletes,
-        HasApiTokens;
+        HasApiTokens,
+        HasPushSubscriptions;
 
     /**
      * The attributes that are mass assignable.
@@ -20,7 +26,10 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name',
+        'username',
+        'email',
+        'password',
     ];
 
     /**
@@ -41,13 +50,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function chats()
+    public function createdChats()
     {
         return $this->hasMany(Chat::class, 'sender_id');
-    }
-
-    public function receivingChats()
-    {
-        return $this->hasMany(Chat::class, 'receiver_id');
     }
 }

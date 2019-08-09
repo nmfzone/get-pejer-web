@@ -2,19 +2,58 @@
 
 namespace App\Http\Controllers\Api\Chat;
 
+use App\Models\Chat;
+use App\Models\User;
+use App\Models\Group;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use App\Transformers\ChatTransformer;
 use App\Http\Controllers\Api\Controller;
 
 class ChatsController extends Controller
 {
     /**
-     * Display the specific chat.
+     * Store newly created chat with receiver.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @throws \Exception
      */
-    public function show(Request $request)
+    public function store(Request $request)
     {
-        //
+        $user = $request->user();
+        $isToGroup = $request->receiverType === 'group';
+
+        $this->validate($request, [
+            'message' => 'required|max:200',
+            'receiver_type' => 'required|in:user,group',
+            'receiver_id' => [
+                'required',
+                Rule::exists($isToGroup ? 'groups' : 'users', 'id')
+                    ->where(function ($query) use ($user, $isToGroup) {
+                        if (! $isToGroup) {
+                            $query->where('id', '!=', $user->id);
+                        }
+                    }
+                ),
+            ],
+        ]);
+
+        if ($isToGroup) {
+            $receiver = Group::findOrFail($request->receiver_id);
+        } else {
+            $receiver = User::findOrFail($request->receiver_id);
+        }
+
+        /** @var \App\Models\Chat $chat */
+        $chat = $receiver->chats()->save((new Chat)->forceFill([
+            'message' => $request->message,
+            'sender_id' => $user->id,
+        ]));
+
+        $chat = $this->preprocessResource($chat, ChatTransformer::class);
+
+        return ChatTransformer::make($chat);
     }
 }

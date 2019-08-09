@@ -17,8 +17,8 @@ Route::namespace('Api')->group(function () {
 
     Route::middleware('auth:api')->group(function () {
         Route::get('/chats/histories', 'Chat\UserChatsController@index');
-        Route::get('/chats/with/{sender}', 'Chat\UserChatsController@withSender');
-        Route::resource('/chats', 'Chat\ChatsController')->only('show');
+        Route::get('/chats/{receivableType}/{receivable}', 'Chat\UserChatsController@withReceivable');
+        Route::resource('/chats', 'Chat\ChatsController')->only('store');
         Route::get('/user', 'User\CurrentUserController@show');
     });
 });

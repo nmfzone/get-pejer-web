@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\HasRecentGroupScope;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\HasRecentGroupScope;
 
 class Chat extends Model
 {
@@ -16,8 +16,6 @@ class Chat extends Model
      */
     protected $fillable = [
         'message',
-        'sender_id',
-        'receiver_id',
     ];
 
     /**
@@ -31,12 +29,12 @@ class Chat extends Model
     }
 
     /**
-     * Get the receiver entity.
+     * Get the receivable entity.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function receiver()
+    public function receivable()
     {
-        return $this->belongsTo(User::class, 'receiver_id');
+        return $this->morphTo();
     }
 }

@@ -2,6 +2,10 @@
 
 namespace App\Transformers;
 
+use App\Models\User;
+use App\Models\Group;
+use Illuminate\Http\Resources\MissingValue;
+
 class ChatTransformer extends Transformer
 {
     /**
@@ -11,7 +15,7 @@ class ChatTransformer extends Transformer
      */
     public $includes = [
         'sender',
-        'receiver',
+        'receivable',
     ];
 
     /**
@@ -24,14 +28,29 @@ class ChatTransformer extends Transformer
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'email' => $this->email,
+            'message' => $this->message,
             'sender_id' => $this->sender_id,
-            'receiver_id' => $this->receiver_id,
-            'sender' => $this->whenLoaded('sender'),
-            'receiver' => $this->whenLoaded('receiver'),
+            'sender' => UserTransformer::make($this->whenLoaded('sender')),
+            'receivable_id' => $this->receivable_id,
+            'receivable_type' => $this->receivable_type,
+            'receivable' => $this->transformReceivable(),
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];
+    }
+
+    protected function transformReceivable()
+    {
+        $value = $this->whenLoaded('receivable');
+
+        if (! $value instanceof MissingValue) {
+            if ($value instanceof User) {
+                return UserTransformer::make($value);
+            } elseif ($value instanceof Group) {
+                return GroupTransformer::make($value);
+            }
+        }
+
+        return $value;
     }
 }

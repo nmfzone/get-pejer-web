@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->command->call('passport:install');
 
         $this->call(UsersTableSeeder::class);
+        $this->call(GroupsTableSeeder::class);
         $this->call(ChatsTableSeeder::class);
     }
 }
