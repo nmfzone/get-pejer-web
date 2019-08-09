@@ -50,8 +50,23 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * Get the chats created by the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function createdChats()
     {
         return $this->hasMany(Chat::class, 'sender_id');
+    }
+
+    /**
+     * Get the groups for the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class)->withTimestamps();
     }
 }
