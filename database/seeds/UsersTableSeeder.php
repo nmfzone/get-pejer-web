@@ -1,8 +1,9 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
+class UsersTableSeeder extends Seeder
 {
     /**
      * Seed the application's database.
@@ -11,8 +12,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->command->call('passport:install');
-
-         $this->call(UsersTableSeeder::class);
+        factory(User::class, 20)->create();
     }
 }
