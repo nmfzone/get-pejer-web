@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,7 +12,11 @@ use Illuminate\Http\Request;
 */
 
 Route::namespace('Api')->group(function () {
+    Route::post('/login', 'Auth\LoginController@login');
+    Route::post('/refresh-token', 'Auth\LoginController@refreshToken');
+
     Route::middleware('auth:api')->group(function () {
-        Route::get('/user', 'CurrentUserController@show');
+        Route::resource('/chats', 'User\CurrentUserController')->only('show');
+        Route::get('/user', 'User\CurrentUserController@show');
     });
 });
