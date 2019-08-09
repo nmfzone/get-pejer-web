@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasRecentGroupScope;
 use Illuminate\Database\Eloquent\Model;
 
 class Chat extends Model
 {
+    use HasRecentGroupScope;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -13,25 +16,27 @@ class Chat extends Model
      */
     protected $fillable = [
         'message',
+        'sender_id',
+        'receiver_id',
     ];
 
     /**
-     * Get the entity of senderable.
+     * Get the sender entity.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function senderable()
+    public function sender()
     {
-        return $this->morphTo();
+        return $this->belongsTo(User::class, 'sender_id');
     }
 
     /**
-     * Get the entity of receivable.
+     * Get the receiver entity.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function receivable()
+    public function receiver()
     {
-        return $this->morphTo();
+        return $this->belongsTo(User::class, 'receiver_id');
     }
 }

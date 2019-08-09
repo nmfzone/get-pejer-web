@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +27,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(191);
+
+        Relation::macro('getClassNameAliasForMorph', function ($class) {
+            if (is_object($class)) {
+                $class = get_class($class);
+            }
+
+            return Arr::get(array_flip(Relation::morphMap()), $class, $class);
+        });
     }
 }
