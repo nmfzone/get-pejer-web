@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
@@ -31,6 +32,8 @@ class Handler extends ExceptionHandler
      *
      * @param  \Exception  $exception
      * @return void
+     *
+     * @throws \Exception
      */
     public function report(Exception $exception)
     {
@@ -46,6 +49,45 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        $e = $this->prepareException($exception);
+
+        if ($this->isApi($request) || $request->expectsJson()) {
+            $statusCode = 500;
+            $message = $e->getMessage();
+            $additionalData = [];
+
+            if ($e instanceof ValidationException) {
+                $statusCode = $e->status;
+                $additionalData['errors'] = $e->errors();
+            } elseif ($this->isHttpException($e)) {
+                $statusCode = $e->getStatusCode();
+            }
+
+            $key = 'response.codes.' . $statusCode;
+            $transMessage = trans($key);
+
+            if (! config('app.debug') && ! $this->isHttpException($e) && $statusCode == 500) {
+                $message = 'Something went wrong';
+            } elseif ($statusCode == 500 && config('app.debug')) {
+                $additionalData = $this->convertExceptionToArray($e);
+            }
+
+            return response()->json(array_merge([
+                'message' => $transMessage !== $key ? $transMessage : $message,
+            ], $additionalData), $statusCode);
+        }
+
         return parent::render($request, $exception);
+    }
+
+    /**
+     * Determine request is from API routes.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function isApi($request)
+    {
+        return $request->is('api/*');
     }
 }
