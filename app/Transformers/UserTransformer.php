@@ -18,10 +18,6 @@ class UserTransformer extends Transformer
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'device_token' => $this->when(
-                optional(Auth::user())->id === $this->id,
-                $this->device_token
-            ),
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];
