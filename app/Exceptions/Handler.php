@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
@@ -56,7 +57,9 @@ class Handler extends ExceptionHandler
             $message = $e->getMessage();
             $additionalData = [];
 
-            if ($e instanceof ValidationException) {
+            if ($e instanceof AuthenticationException) {
+                $statusCode = 401;
+            } elseif ($e instanceof ValidationException) {
                 $statusCode = $e->status;
                 $additionalData['errors'] = $e->errors();
             } elseif ($this->isHttpException($e)) {
