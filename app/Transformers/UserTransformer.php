@@ -2,8 +2,6 @@
 
 namespace App\Transformers;
 
-use Illuminate\Support\Facades\Auth;
-
 class UserTransformer extends Transformer
 {
     /**
