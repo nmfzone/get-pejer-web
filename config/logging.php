@@ -40,6 +40,12 @@ return [
             'ignore_exceptions' => false,
         ],
 
+        'stack_prod' => [
+            'driver' => 'stack',
+            'channels' => ['stack', 'sentry'],
+            'ignore_exceptions' => false,
+        ],
+
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
@@ -88,6 +94,11 @@ return [
         'errorlog' => [
             'driver' => 'errorlog',
             'level' => 'debug',
+        ],
+
+        'sentry' => [
+            'driver' => 'sentry',
+            'level' => env('LOG_SENTRY_LEVEL', 400),
         ],
     ],
 
