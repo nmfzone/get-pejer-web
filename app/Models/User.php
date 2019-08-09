@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Models\Concerns\Chatable;
-use App\Models\Concerns\Tokenable;
 use Laravel\Passport\HasApiTokens;
+use App\Models\Concerns\DeviceTokenable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -14,10 +14,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     use Chatable,
-        Tokenable,
         Notifiable,
         SoftDeletes,
         HasApiTokens,
+        DeviceTokenable,
         HasPushSubscriptions;
 
     /**

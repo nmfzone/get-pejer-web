@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateChatsTable extends Migration
+class CreateViewablesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,13 @@ class CreateChatsTable extends Migration
      */
     public function up()
     {
-        Schema::create('chats', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->text('message');
-            $table->unsignedBigInteger('sender_id');
-            $table->foreign('sender_id')
+        Schema::create('viewables', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')
                 ->references('id')
                 ->on('users');
-            $table->morphs('receivable', 'chats_index_1');
+            $table->morphs('viewable', 'viewables_index_1');
+            $table->index(['user_id', 'viewable_id'], 'viewables_index_2');
             $table->timestamps();
         });
     }
@@ -32,6 +31,6 @@ class CreateChatsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('chats');
+        Schema::dropIfExists('viewables');
     }
 }

@@ -13,9 +13,9 @@ class CreateDeviceTokensTable extends Migration
      */
     public function up()
     {
-        Schema::create('tokens', function (Blueprint $table) {
+        Schema::create('device_tokens', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('value', 500)->unique();
+            $table->string('token', 500)->unique();
         });
     }
 
@@ -26,6 +26,6 @@ class CreateDeviceTokensTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tokens');
+        Schema::dropIfExists('device_tokens');
     }
 }

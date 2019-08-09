@@ -7,7 +7,7 @@ use App\Models\Chat;
 trait Chatable
 {
     /**
-     * Get the chatable's chats.
+     * Get the model's chats.
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
