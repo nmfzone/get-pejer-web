@@ -22,11 +22,11 @@ class Group extends Model
     ];
 
     /**
-     * Get the group users.
+     * Get the group participants.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function users()
+    public function participants()
     {
         return $this->belongsToMany(User::class)->withTimestamps();
     }
