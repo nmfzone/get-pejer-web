@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Viewable;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Concerns\HasRecentGroupScope;
 
 class Chat extends Model
 {
-    use HasRecentGroupScope;
+    use Viewable,
+        HasRecentGroupScope;
 
     /**
      * The attributes that are mass assignable.

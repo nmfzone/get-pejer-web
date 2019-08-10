@@ -61,6 +61,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the chats viewed by the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+     */
+    public function viewChats()
+    {
+        return $this->morphToMany(Chat::class, 'viewable')->withTimestamps();
+    }
+
+    /**
      * Get the groups for the user.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
