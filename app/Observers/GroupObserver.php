@@ -3,7 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Group;
-use Illuminate\Support\Str;
+use App\Garage\Utility\Helper;
 
 class GroupObserver
 {
@@ -12,9 +12,11 @@ class GroupObserver
      *
      * @param \App\Models\Group  $group
      * @return void
+     *
+     * @throws \Exception
      */
     public function creating(Group $group)
     {
-        $group->code = Str::uuid()->toString();
+        $group->code = Helper::generateUniqueUuid(Group::class, 'code');
     }
 }

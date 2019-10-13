@@ -59,7 +59,7 @@ class UserChatsController extends Controller
         /** @var \App\Models\User $user */
         $user = $request->user();
 
-        if (! in_array($receivableType, ['users', 'groups'])) {
+        if (! in_array($receivableType, ['users', 'groups'], true)) {
             abort(404);
         }
 
@@ -72,7 +72,7 @@ class UserChatsController extends Controller
                 ->where(function (Builder $query) use ($user, $receivable) {
                     $query->whereHasMorph(
                         'receivable',
-                        get_class($receivable),
+                        Group::class,
                         function (Builder $query) use ($user) {
                             $query->whereHas('users', function (Builder $query) use ($user) {
                                 $query->where('user_id', $user->id);
@@ -87,12 +87,12 @@ class UserChatsController extends Controller
             $query = Chat::query()
                 ->where(function (Builder $query) use ($user, $receivable) {
                     $query->where('sender_id', $user->id)
-                        ->whereHasMorph('receivable', get_class($receivable))
+                        ->whereHasMorph('receivable', User::class)
                         ->where('receivable_id', $receivable->id);
                 })
                 ->orWhere(function (Builder $query) use ($user, $receivable) {
                     $query->where('sender_id', $receivable->id)
-                        ->whereHasMorph('receivable', get_class($receivable))
+                        ->whereHasMorph('receivable', User::class)
                         ->where('receivable_id', $user->id);
                 });
         }

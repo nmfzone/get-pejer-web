@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Models\Concerns\Chatable;
+use App\Models\Concerns\HasCreator;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Concerns\DeviceTokenable;
 
 class Group extends Model
 {
     use Chatable,
+        HasCreator,
         DeviceTokenable;
 
     /**

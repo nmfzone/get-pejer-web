@@ -35,8 +35,7 @@ class ChatsController extends Controller
                         if (! $isToGroup) {
                             $query->where('id', '!=', $user->id);
                         }
-                    }
-                ),
+                    }),
             ],
         ]);
 

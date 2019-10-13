@@ -10,9 +10,9 @@ use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\DB;
 use Psr\Http\Message\ResponseInterface;
 use App\Http\Controllers\Api\Controller;
-use Illuminate\Validation\ValidationException;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Validation\ValidationException;
 use Laravel\Passport\Client as PassportClient;
 
 class LoginController extends Controller
@@ -103,7 +103,7 @@ class LoginController extends Controller
         $http = new Client();
 
         try {
-            $guzzleResponse = $http->post(config('app.url').'/oauth/token', [
+            $guzzleResponse = $http->post(config('app.url') . '/oauth/token', [
                 'form_params' => $data,
                 'timeout' => 15,
             ]);
@@ -146,6 +146,7 @@ class LoginController extends Controller
 
             $user = $request->user('api');
 
+            // We can perform user state checking here. Something like user is_active state.
             if (true) {
                 event(new Login('api', $user, false));
 
@@ -201,6 +202,8 @@ class LoginController extends Controller
      * Throw failed login error message.
      *
      * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     protected function sendFailedLoginResponse()
     {

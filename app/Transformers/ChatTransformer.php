@@ -41,16 +41,16 @@ class ChatTransformer extends Transformer
 
     protected function transformReceivable()
     {
-        $value = $this->whenLoaded('receivable');
+        $receivable = $this->whenLoaded('receivable');
 
-        if (! $value instanceof MissingValue) {
-            if ($value instanceof User) {
-                return UserTransformer::make($value);
-            } elseif ($value instanceof Group) {
-                return GroupTransformer::make($value);
+        if (! $receivable instanceof MissingValue) {
+            if ($receivable instanceof User) {
+                return UserTransformer::make($receivable);
+            } elseif ($receivable instanceof Group) {
+                return GroupTransformer::make($receivable);
             }
         }
 
-        return $value;
+        return $receivable;
     }
 }

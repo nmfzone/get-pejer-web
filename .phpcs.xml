@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<ruleset name="PPSDM Code Standard" namespace="GetPejer\CS\Standard">
+    <description>Code Standard used for GetPejer</description>
+
+    <file>./app</file>
+
+    <arg name="colors"/>
+
+    <rule ref="PSR2" />
+
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax" />
+
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="110" />
+            <property name="absoluteLineLimit" value="110" />
+        </properties>
+    </rule>
+
+    <rule ref="PSR2.Methods.FunctionCallSignature">
+        <properties>
+            <property name="allowMultipleArguments" value="true" />
+        </properties>
+    </rule>
+</ruleset>
