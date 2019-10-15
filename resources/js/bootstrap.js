@@ -4,6 +4,7 @@ import Axios from 'axios'
 import Vue from 'vue'
 import Moment from 'moment'
 import Echo from 'laravel-echo'
+import SocketIOClient from 'socket.io-client'
 import 'moment-timezone'
 import 'moment/locale/id'
 import Qs from 'qs'
@@ -39,6 +40,8 @@ if (token) {
 window.moment = Moment
 
 Vue.prototype.moment = Moment
+
+window.io = SocketIOClient
 
 window.Echo = new Echo({
   broadcaster: 'socket.io',
