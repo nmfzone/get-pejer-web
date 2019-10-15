@@ -75,13 +75,17 @@
           this.chats.unshift(chat)
         })
 
+        let echo = null
+
         if (this.opponentType === 'users') {
-          Echo.private(`chats.users.${this.authUser.id}.to.${this.opponentId}`)
+          echo = Echo.private(`chats.users.${this.authUser.id}.to.${this.opponentId}`)
         } else if (this.opponentType === 'groups') {
-          Echo.private(`chats.groups.${this.opponentId}`)
+          echo = Echo.private(`chats.groups.${this.opponentId}`)
+        } else {
+          throw new Error('Type isn\'t supported.');
         }
 
-        Echo.listen('ChatCreated', (e) => {
+        echo.listen('ChatCreated', (e) => {
           this.pushChat(e.chat)
         })
 
