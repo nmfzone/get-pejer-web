@@ -23,7 +23,7 @@ class ChatsController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
-        $isToGroup = $request->receiverType === 'group';
+        $isToGroup = $request->receiver_type === 'group';
 
         $this->validate($request, [
             'message' => 'required|max:200',
@@ -41,8 +41,14 @@ class ChatsController extends Controller
 
         if ($isToGroup) {
             $receiver = Group::findOrFail($request->receiver_id);
+
+            if (! $receiver->participants()->find($user->id)) {
+                abort(403, 'You don\'t belongs to this group.');
+            }
         } else {
             $receiver = User::findOrFail($request->receiver_id);
+
+            // Validate user is allowed to send message to the receiver or not.
         }
 
         /** @var \App\Models\Chat $chat */

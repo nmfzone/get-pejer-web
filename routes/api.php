@@ -16,7 +16,7 @@ Route::namespace('Api')->group(function () {
     Route::post('/refresh-token', 'Auth\LoginController@refreshToken');
 
     Route::middleware('auth:api')->group(function () {
-        Route::get('/chats/histories', 'Chat\UserChatsController@index');
+        Route::get('/chats/conversations', 'Chat\UserChatsController@index');
         Route::get('/chats/{receivableType}/{receivable}', 'Chat\UserChatsController@withReceivable');
         Route::resource('/chats', 'Chat\ChatsController')->only('store');
         Route::get('/user', 'User\CurrentUserController@show');

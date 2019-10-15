@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 class UserChatsController extends Controller
 {
     /**
-     * Display chat histories for the current user.
+     * Display chat conversations for the current user.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
@@ -30,13 +30,17 @@ class UserChatsController extends Controller
                         'receivable',
                         Group::class,
                         function (Builder $query) use ($user) {
-                            $query->whereHas('users', function (Builder $query) use ($user) {
+                            $query->whereHas('participants', function (Builder $query) use ($user) {
                                 $query->where('user_id', $user->id);
                             });
                         }
-                    );
+                    )
+                    ->orWhere(function (Builder $query) use ($user) {
+                        $query->whereHasMorph('receivable', User::class)
+                            ->where('receivable_id', $user->id);
+                    });
             })
-            ->recentEachGroup(['sender_id', 'receivable_id', 'receivable_type'])
+            ->recentEachGroup(['receivable_id', 'receivable_type'])
             ->with('sender', 'receivable')
             ->latest()
             ->orderByDesc('chats.id');
@@ -47,7 +51,7 @@ class UserChatsController extends Controller
     }
 
     /**
-     * Display chat history on the given receivable.
+     * Display chat conversations with the given receivable.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $receivableType
@@ -74,7 +78,7 @@ class UserChatsController extends Controller
                         'receivable',
                         Group::class,
                         function (Builder $query) use ($user) {
-                            $query->whereHas('users', function (Builder $query) use ($user) {
+                            $query->whereHas('participants', function (Builder $query) use ($user) {
                                 $query->where('user_id', $user->id);
                             });
                         }

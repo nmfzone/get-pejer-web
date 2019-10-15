@@ -8,7 +8,7 @@ use App\Garage\Utility\Helper;
 class GroupObserver
 {
     /**
-     * Listen to the User created event.
+     * Listen to the Group created event.
      *
      * @param \App\Models\Group  $group
      * @return void
