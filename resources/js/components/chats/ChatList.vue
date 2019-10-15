@@ -47,11 +47,19 @@
       }
     },
     async mounted() {
-      const response = (await axios.get('/api/chats/conversations'))
+      this.fetchChats()
 
-      this.chats = _.get(response, 'data.data')
+      Echo.private(`chats.all.${this.authUser.id}`)
+        .listen('ChatCreated', (e) => {
+          this.fetchChats()
+        })
     },
     methods: {
+      async fetchChats() {
+        const response = (await axios.get('/api/chats/conversations'))
+
+        this.chats = _.get(response, 'data.data')
+      },
       getOpponentId(chat) {
         if (chat.sender_id === this.authUser.id || chat.receivable_type === 'group') {
           return chat.receivable_id

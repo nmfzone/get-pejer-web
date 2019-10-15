@@ -3,6 +3,7 @@
 namespace App\Events\Chats;
 
 use App\Models\Chat;
+use App\Models\User;
 use App\Events\Event;
 use App\Models\Group;
 use Illuminate\Broadcasting\Channel;
@@ -36,16 +37,45 @@ class ChatCreated extends Event implements ShouldBroadcast
     }
 
     /**
+     * Get the data to broadcast.
+     *
+     * @return array
+     */
+    public function broadcastWith()
+    {
+        return [
+            'chat' => $this->chat->load('sender', 'receivable'),
+        ];
+    }
+
+    /**
      * Get the channels the event should broadcast on.
      *
      * @return \Illuminate\Broadcasting\Channel|array
      */
     public function broadcastOn()
     {
+        $senderId = $this->chat->sender_id;
+        $receivableId = $this->chat->receivable_id;
+        $channels = [];
+
         if ($this->chat->receivable instanceof Group) {
-            return new PrivateChannel('chats.groups.' . $this->chat->receivable_id);
+            $this->chat->receivable->participants->each(function ($participant) use ($channels) {
+                array_push($channels, new PrivateChannel('chats.all.' . $participant->id));
+            });
+
+            $channels = array_merge($channels, [
+                new PrivateChannel('chats.groups.' . $receivableId),
+            ]);
+        } elseif ($this->chat->receivable instanceof User) {
+            $channels = array_merge($channels, [
+                new PrivateChannel('chats.all.' . $senderId),
+                new PrivateChannel('chats.all.' . $senderId),
+                new PrivateChannel('chats.users.' . $senderId . '.to.' . $receivableId),
+                new PrivateChannel('chats.users.' . $receivableId . '.to.' . $senderId),
+            ]);
         }
 
-        return new PrivateChannel('chats.users.' . ($this->chat->sender_id + $this->chat->receivable_id));
+        return $channels;
     }
 }

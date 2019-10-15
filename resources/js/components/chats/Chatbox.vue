@@ -59,8 +59,6 @@
     data() {
       return {
         chats: [],
-        channelType: this.opponentType,
-        channelId: this.opponentId,
         loading: true,
         error: false,
         formDisabled: false,
@@ -68,10 +66,6 @@
       }
     },
     async mounted() {
-      if (this.type === 'users') {
-        this.channelId = this.channelId + this.authUser.id
-      }
-
       try {
         const response = (await axios.get(`/api/chats/${this.opponentType}/${this.opponentId}`))
 
@@ -81,10 +75,15 @@
           this.chats.unshift(chat)
         })
 
-        Echo.private(`chats.${this.channelType}.${this.channelId}`)
-          .listen('ChatCreated', (e) => {
-            this.pushChat(e.chat)
-          })
+        if (this.opponentType === 'users') {
+          Echo.private(`chats.users.${this.authUser.id}.to.${this.opponentId}`)
+        } else if (this.opponentType === 'groups') {
+          Echo.private(`chats.groups.${this.opponentId}`)
+        }
+
+        Echo.listen('ChatCreated', (e) => {
+          this.pushChat(e.chat)
+        })
 
         this.scrollToBottom()
         window.addEventListener('keydown', this.onKeyDown)
