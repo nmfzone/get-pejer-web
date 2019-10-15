@@ -26,8 +26,8 @@ $factory->define(Chat::class, function (Faker $faker) {
         $receivable = Group::inRandomOrder()->first();
 
         // Attach user to the group.
-        if (! $receivable->users()->find($sender->id)) {
-            $receivable->users()->save($sender);
+        if (! $receivable->participants()->find($sender->id)) {
+            $receivable->participants()->save($sender);
         }
     } else {
         $receivable = User::where('id', '!=', $sender->id)->inRandomOrder()->first();
