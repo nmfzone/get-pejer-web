@@ -47,9 +47,6 @@ window.io = SocketIOClient
 window.Pusher = Pusher
 
 window.Echo = new Echo({
-  broadcaster: 'pusher',
-  host: process.env.MIX_PUSHER_APP_HOST,
-  key: process.env.MIX_PUSHER_APP_KEY,
-  cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-  encrypted: true
+  broadcaster: 'socket.io',
+  host: process.env.MIX_PUSHER_APP_HOST
 })
