@@ -4,7 +4,6 @@ import Axios from 'axios'
 import Vue from 'vue'
 import Moment from 'moment'
 import Echo from 'laravel-echo'
-import Pusher from 'pusher-js'
 import 'moment-timezone'
 import 'moment/locale/id'
 import Qs from 'qs'
@@ -41,11 +40,8 @@ window.moment = Moment
 
 Vue.prototype.moment = Moment
 
-window.Pusher = Pusher
-
 window.Echo = new Echo({
-  broadcaster: 'pusher',
-  key: process.env.MIX_PUSHER_APP_KEY,
-  cluster: process.env.MIX_PUSHER_APP_CLUSTER,
+  broadcaster: 'socket.io',
+  host: process.env.MIX_PUSHER_APP_HOST,
   encrypted: true
 })
