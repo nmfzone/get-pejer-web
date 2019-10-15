@@ -49,5 +49,6 @@ window.Pusher = Pusher
 window.Echo = new Echo({
   broadcaster: 'pusher',
   host: process.env.MIX_PUSHER_APP_HOST,
+  key: process.env.MIX_PUSHER_APP_KEY,
   encrypted: true
 })
