@@ -48,5 +48,5 @@ window.Pusher = Pusher
 
 window.Echo = new Echo({
   broadcaster: 'socket.io',
-  host: process.env.MIX_PUSHER_APP_HOST
+  host: process.env.MIX_SOCKET_IO_HOST
 })
