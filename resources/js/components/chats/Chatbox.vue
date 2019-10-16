@@ -85,7 +85,7 @@
           throw new Error('Type isn\'t supported.');
         }
 
-        echo.listen('ChatCreated', (e) => {
+        echo.listen('Chats\\ChatCreated', (e) => {
           this.pushChat(e.chat)
         })
 

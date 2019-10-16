@@ -26,6 +26,13 @@ class ChatCreated extends Event implements ShouldBroadcast
     public $chat;
 
     /**
+     * The name of the queue on which to place the event.
+     *
+     * @var string
+     */
+    public $queue = 'high';
+
+    /**
      * Create a new event instance.
      *
      * @param \App\Models\Chat  $chat

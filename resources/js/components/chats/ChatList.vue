@@ -50,7 +50,7 @@
       this.fetchChats()
 
       Echo.private(`chats.all.${this.authUser.id}`)
-        .listen('ChatCreated', (e) => {
+        .listen('Chats\\ChatCreated', (e) => {
           this.fetchChats()
         })
     },
