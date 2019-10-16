@@ -86,6 +86,7 @@
         }
 
         echo.listen('Chats\\ChatCreated', (e) => {
+          console.log('Hello', e)
           this.pushChat(e.chat)
         })
 
