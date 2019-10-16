@@ -14,7 +14,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class ChatCreated extends Event implements ShouldBroadcast
+class NotifyNewChat extends Event implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -41,8 +41,6 @@ class ChatCreated extends Event implements ShouldBroadcast
     public function __construct(Chat $chat)
     {
         $this->chat = $chat;
-
-        $this->dontBroadcastToCurrentUser();
     }
 
     /**
@@ -66,13 +64,19 @@ class ChatCreated extends Event implements ShouldBroadcast
     {
         $senderId = $this->chat->sender_id;
         $receivableId = $this->chat->receivable_id;
+        $channels = [];
 
         if ($this->chat->receivable instanceof Group) {
-            return new PrivateChannel('chats.groups.' . $receivableId);
+            $this->chat->receivable->participants->each(function ($participant) use ($channels) {
+                array_push($channels, new PrivateChannel('chats.all.' . $participant->id));
+            });
         } elseif ($this->chat->receivable instanceof User) {
-            return new PrivateChannel('chats.users.' . $receivableId . '.to.' . $senderId);
+            $channels = array_merge($channels, [
+                new PrivateChannel('chats.all.' . $senderId),
+                new PrivateChannel('chats.all.' . $receivableId),
+            ]);
         }
 
-        return [];
+        return $channels;
     }
 }

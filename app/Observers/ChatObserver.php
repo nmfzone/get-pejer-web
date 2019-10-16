@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Chat;
 use App\Events\Chats\ChatCreated;
+use App\Events\Chats\NotifyNewChat;
 
 class ChatObserver
 {
@@ -18,5 +19,6 @@ class ChatObserver
     public function created(Chat $chat)
     {
         event(new ChatCreated($chat));
+        event(new NotifyNewChat($chat));
     }
 }
