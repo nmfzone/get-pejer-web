@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Chat;
 use App\Models\User;
 use App\Models\Group;
 use Illuminate\Support\Arr;
+use App\Observers\ChatObserver;
 use App\Observers\GroupObserver;
 use App\Garage\ClientSide\ClientSide;
 use Illuminate\Support\ServiceProvider;
@@ -48,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Group::observe(GroupObserver::class);
+        Chat::observe(ChatObserver::class);
     }
 
     /**
