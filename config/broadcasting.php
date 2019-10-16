@@ -40,7 +40,7 @@ return [
                 'host' => env('PUSHER_APP_HOST', env('APP_URL')),
                 'port' => env('PUSHER_APP_PORT', 6001),
                 'scheme' => env('PUSHER_APP_SCHEME', 'http'),
-                'useTLS' => true,
+                'useTLS' => env('PUSHER_USE_TLS', true),
             ],
         ],
 
