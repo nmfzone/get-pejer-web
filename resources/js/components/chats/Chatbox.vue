@@ -90,6 +90,8 @@
           this.pushChat(e.chat)
         })
 
+        console.log('Laravel Echo', echo)
+
         this.scrollToBottom()
         window.addEventListener('keydown', this.onKeyDown)
         this.loading = false
