@@ -21,6 +21,7 @@ const webpackConfig = {
       '@views': `${root}/resources/js/views`,
       '@components': `${root}/resources/js/components`,
       '@store': `${root}/resources/js/store`,
+      '@module': `${root}/resources/js/modules`,
       '@vendor': `${root}/vendor`
     }
   }

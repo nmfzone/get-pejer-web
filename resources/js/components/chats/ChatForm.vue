@@ -62,6 +62,10 @@
               message: this.content,
               receiver_id: this.receiverId,
               receiver_type: this.getReceiverType()
+            }, {
+              params: {
+                includes: ['sender', 'receivable'],
+              }
             })
             this.content = ''
             this.$emit('chat-created', _.get(response, 'data.data'))

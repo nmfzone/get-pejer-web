@@ -1,0 +1,1 @@
+export const SET_INBOX_CHATS = 'SET_INBOX_CHATS'

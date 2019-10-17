@@ -14,6 +14,7 @@
             </div>
           @endif
 
+          <init></init>
           <chat-list></chat-list>
         </div>
       </div>

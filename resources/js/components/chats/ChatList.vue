@@ -2,7 +2,7 @@
   <div class="chat-list">
     <transition name="slide-right" v-on:after-leave="showChatbox">
       <div class="conversations" v-if="isConversationShow">
-        <template v-for="chat in chats" v-if="chats.length > 0">
+        <template v-for="chat in inboxChats" v-if="inboxChats.length > 0">
           <a :href="`?with=${getOpponentId(chat)}&type=${getOpponentType(chat)}`" class="user-box">
             <div class="user" :key="chat.id" @click.prevent="chatSelected(chat)">
                 {{ getOpponentName(chat) }} <span class="btn btn-success">{{ getOpponentType(chat) }}</span>
@@ -22,18 +22,23 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
   import { getUrlParam } from '@common/utils'
 
   export default {
     data() {
       return {
-        chats: [],
         isConversationShow: true,
         isChatboxShow: false,
         opponentId: null,
         opponentType: null,
         authUser: window.App.user
       }
+    },
+    computed: {
+      ...mapGetters({
+        inboxChats: 'chat/getInboxChats'
+      })
     },
     beforeMount() {
       const opponentId = getUrlParam('with')
@@ -46,19 +51,12 @@
         this.opponentType = opponentType
       }
     },
-    async mounted() {
+    mounted() {
       this.fetchChats()
-
-      Echo.private(`chats.all.${this.authUser.id}`)
-        .listen('Chats.ChatCreated', (e) => {
-          this.fetchChats()
-        })
     },
     methods: {
       async fetchChats() {
-        const response = (await axios.get('/api/chats/conversations'))
-
-        this.chats = _.get(response, 'data.data')
+        return this.$store.dispatch('chat/fetchInboxChats')
       },
       getOpponentId(chat) {
         if (chat.sender_id === this.authUser.id || chat.receivable_type === 'group') {
@@ -83,17 +81,19 @@
       },
       showConversation() {
         this.isConversationShow = true
+        this.isChatboxShow = false
       },
       showChatbox() {
+        this.isConversationShow = false
         this.isChatboxShow = true
       },
       chatSelected(chat) {
-        this.isConversationShow = false
         this.opponentId = this.getOpponentId(chat)
         this.opponentType = this.getOpponentType(chat)
+        this.showChatbox()
       },
       hideChatbox() {
-        this.isChatboxShow = false
+        this.showConversation()
         this.opponentType = null
         this.opponentId = null
       }
