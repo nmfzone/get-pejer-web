@@ -65,7 +65,7 @@ class NotifyNewChat extends Event implements ShouldBroadcast
         $channels = [];
 
         if ($this->chat->receivable instanceof Group) {
-            $this->chat->receivable->participants->each(function ($participant) use ($channels) {
+            $this->chat->receivable->participants->each(function ($participant) use (&$channels) {
                 array_push($channels, new PrivateChannel('chats.all.' . $participant->id));
             });
         } elseif ($this->chat->receivable instanceof User) {
