@@ -27,8 +27,13 @@ const actions = {
     let chats = [chat]
 
     _.each(state.inboxChats, (iChat) => {
-      if (iChat.receivable_id !== chat.receivable_id ||
-        (iChat.receivable_id === chat.receivable_id && iChat.receiver_type !== chat.receiver_type)) {
+      if (
+        (iChat.receivable_type === 'user' &&
+          (iChat.sender_id === chat.sender_id && iChat.receivable_id !== chat.receivable_id) &&
+          (iChat.receivable_id === chat.receivable_id && iChat.sender_id !== chat.sender_id)) ||
+        (iChat.receivable_type === 'group'
+          && iChat.receivable_id !== chat.receivable_id)
+      ) {
         chats.push(iChat)
       }
     })
