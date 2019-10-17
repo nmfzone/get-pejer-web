@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Transformers\ChatTransformer;
 use App\Http\Controllers\Api\Controller;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class UserChatsController extends Controller
 {
@@ -24,23 +25,16 @@ class UserChatsController extends Controller
         $user = $request->user();
 
         $chats = Chat::query()
-            ->where(function (Builder $query) use ($user) {
-                $query->where('sender_id', $user->id)
-                    ->orWhereHasMorph(
-                        'receivable',
-                        Group::class,
-                        function (Builder $query) use ($user) {
-                            $query->whereHas('participants', function (Builder $query) use ($user) {
-                                $query->where('user_id', $user->id);
-                            });
-                        }
-                    )
-                    ->orWhere(function (Builder $query) use ($user) {
-                        $query->whereHasMorph('receivable', User::class)
-                            ->where('receivable_id', $user->id);
-                    });
-            })
-            ->recentEachGroup(['receivable_id', 'receivable_type'])
+            ->fromSub(function (QueryBuilder $query) use ($user) {
+                return $query->rawQuery(
+                    Chat::query()
+                        ->selectRaw('receivable_id, receivable_type, max(id) as max_id')
+                        ->recentEachGroup($user, ['sender_id', 'receivable_id'])
+                        ->groupBy(['receivable_id', 'receivable_type'])
+                        ->toRawSql()
+                );
+            }, 'grouped_chats')
+            ->join('chats', 'grouped_chats.max_id', '=', 'chats.id')
             ->with('sender', 'receivable')
             ->latest()
             ->orderByDesc('chats.id');
