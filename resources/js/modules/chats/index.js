@@ -30,8 +30,7 @@ const actions = {
       if (
         (iChat.receivable_type === 'user' &&
           chat.receivable_type === 'user' &&
-          ((iChat.sender_id === chat.sender_id && iChat.receivable_id !== chat.receivable_id) ||
-          (iChat.receivable_id === chat.receivable_id && iChat.sender_id !== chat.sender_id))) ||
+          (iChat.sender_id !== chat.receivable_id && iChat.receivable_id !== chat.sender_id)) ||
         (iChat.receivable_type === 'group' &&
           chat.receivable_type === 'group' &&
           iChat.receivable_id !== chat.receivable_id)
