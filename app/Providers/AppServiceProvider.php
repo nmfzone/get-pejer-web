@@ -59,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
             return array_reduce($this->getBindings(), function ($sql, $binding) {
                 return preg_replace(
                     '/\?/',
-                    is_numeric($binding) ? $binding : "'".$binding."'" ,
+                    is_numeric($binding) ? $binding : "'" . $binding . "'",
                     $sql,
                     1
                 );
@@ -88,6 +88,7 @@ class AppServiceProvider extends ServiceProvider
     {
         ClientSideFacade::share('oldInput', function () {
             $oldInput = Arr::wrap(request()->session()->getOldInput());
+
             return Arr::except($oldInput, '_token');
         });
         ClientSideFacade::share('errors', function () {
