@@ -34,6 +34,8 @@ const actions = {
               iChat.receivable_id !== chat.sender_id &&
               iChat.sender_id !== chat.sender_id &&
               iChat.receivable_id !== chat.receivable_id) ||
+            (iChat.sender_id === chat.sender_id && iChat.receivable_id !== chat.receivable_id) ||
+            (iChat.receivable_id === chat.receivable_id && iChat.sender_id !== chat.sender_id) ||
             (iChat.sender_id === chat.receivable_id && iChat.receivable_id !== chat.sender_id) ||
             (iChat.sender_id !== chat.receivable_id && iChat.receivable_id === chat.sender_id))) ||
         (iChat.receivable_type === 'group' &&
