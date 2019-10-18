@@ -17,6 +17,7 @@ class UserTransformer extends Transformer
             'name' => $this->name,
             'username' => $this->username,
             'email' => $this->email,
+            'chat_last_seen_at' => optional($this->chat_last_seen_at)->toDateTimeString(),
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];

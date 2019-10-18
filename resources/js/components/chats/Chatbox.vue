@@ -83,6 +83,10 @@
         let response = (await axios.get(`/api/${this.opponentType}/${this.opponentId}`))
         this.opponent = _.get(response, 'data.data')
 
+        if (this.opponent.chat_last_seen_at) {
+          this.opponentLastSeen = moment(this.opponent.chat_last_seen_at)
+        }
+
         response = (await axios.get(`/api/chats/${this.opponentType}/${this.opponentId}`))
 
         const chats = _.get(response, 'data.data')
@@ -114,9 +118,9 @@
             this.listenOfflineStatus()
           })
 
+        this.loading = false
         this.scrollToBottom()
         window.addEventListener('keydown', this.onKeyDown)
-        this.loading = false
       } catch (e) {
         this.loading = false
         this.error = true

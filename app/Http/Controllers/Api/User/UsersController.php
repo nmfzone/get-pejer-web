@@ -37,7 +37,13 @@ class UsersController extends Controller
      */
     public function storeOnlineStatus(Request $request)
     {
-        event(new UserOnline($request->user()));
+        $user = tap($request->user()
+            ->forceFill([
+                'chat_last_seen_at' => now(),
+            ]))
+            ->save();
+
+        event(new UserOnline($user));
 
         return $this->response([
             'message' => 'You\'re online now.',

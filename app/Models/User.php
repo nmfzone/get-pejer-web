@@ -47,6 +47,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'chat_last_seen_at' => 'datetime',
     ];
 
     /**
