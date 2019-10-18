@@ -37,7 +37,9 @@
                   {{ moment(chat.created_at).format('HH:mm') }}
                 </div>
               </div>
-              <div class="chat-content" v-html="formatChatContent(chat.message)"></div>
+              <div class="chat-content">
+                <vue-markdown :source="chat.message" />
+              </div>
             </div>
           </div>
         </template>
@@ -186,7 +188,8 @@
         return chat.sender_id === this.authUser.id ? 'Anda' : chat.sender.name
       },
       formatChatContent(content) {
-        return content.replace(/(?:\r\n|\r|\n)/g, '<br>')
+        return content
+        // return content.replace(/(?:\r\n|\r|\n)/g, '<br>')
       },
       back() {
         window.removeEventListener('keydown', this.onKeyDown)
@@ -275,6 +278,37 @@
         overflow-wrap: break-word;
         word-wrap: break-word;
         hyphens: auto;
+
+        ::v-deep code {
+          padding: 2px 4px;
+          font-size: 90%;
+          color: #333;
+          background-color: #f5f5f5;
+          border-radius: 4px;
+        }
+
+        ::v-deep pre {
+          display: block;
+          padding: 9.5px;
+          margin: 0 0 10px;
+          font-size: 13px;
+          line-height: 1.42857143;
+          color: #333;
+          word-break: break-all;
+          word-wrap: break-word;
+          background-color: #f5f5f5;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+
+          code {
+            padding: 0;
+            font-size: inherit;
+            color: inherit;
+            white-space: pre-wrap;
+            background-color: transparent;
+            border-radius: 0;
+          }
+        }
       }
 
       &.current-user {
