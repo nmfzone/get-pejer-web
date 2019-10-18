@@ -7,6 +7,9 @@
       <div class="opponent-name">
         {{ opponent.name }}
         <div class="online-indicator" v-if="isOpponentOnline">Online</div>
+        <div class="last-seen-indicator" v-if="!isOpponentOnline && opponentLastSeen">
+          Terakhir dilihat: {{ date(opponentLastSeen) }}
+        </div>
       </div>
       <div class="chat-list" ref="chatList">
         <template v-if="error">
@@ -70,6 +73,7 @@
         error: false,
         formDisabled: false,
         isOpponentOnline: false,
+        opponentLastSeen: null,
         offlineListenerInterval: null,
         authUser: window.App.user
       }
@@ -102,9 +106,10 @@
           this.pushChat(e.chat)
         })
 
-        // Online Status Listener
+        // Opponent Online Status Listener
         Echo.channel(`users.online.${this.opponentId}`)
           .listen('UserOnline', (e) => {
+            this.opponentLastSeen = moment()
             this.isOpponentOnline = true
             this.listenOfflineStatus()
           })
@@ -121,16 +126,22 @@
       }
     },
     destroyed() {
-      if (this.offlineListenerInterval) {
-        clearInterval(this.offlineListenerInterval)
-      }
+      this.clearOfflineListenerInterval()
     },
     methods: {
       listenOfflineStatus() {
-        if (this.isOpponentOnline) {
-          this.offlineListenerInterval = setInterval(() => {
+        this.clearOfflineListenerInterval()
+
+        this.offlineListenerInterval = setInterval(() => {
+          if (this.opponentLastSeen && this.opponentLastSeen.isSameOrBefore(moment().add(-30, 's'))) {
             this.isOpponentOnline = false
-          }, 9999)
+            this.clearOfflineListenerInterval()
+          }
+        }, 20000)
+      },
+      clearOfflineListenerInterval() {
+        if (this.offlineListenerInterval) {
+          clearInterval(this.offlineListenerInterval)
         }
       },
       pushChat(data) {
@@ -199,6 +210,10 @@
     .online-indicator {
       font-size: 13px;
       color: #3cab64;
+    }
+
+    .last-seen-indicator {
+      font-size: 13px;
     }
   }
   .chat-list {

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import store from '@store'
 import './bootstrap'
+import * as utils from '@common/utils'
 
 import InitComponent from './components/Init.vue'
 
@@ -14,6 +15,8 @@ Vue.component('chat-form', ChatFormComponent)
 Vue.component('chat-list', ChatListComponent)
 
 moment.tz.setDefault('Asia/Jakarta')
+
+Vue.prototype.date = utils.date
 
 
 new Vue({
