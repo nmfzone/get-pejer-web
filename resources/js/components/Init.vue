@@ -14,6 +14,10 @@
         .listen('Chats.NotifyNewChat', (e) => {
           this.$store.dispatch('chat/addChatToInbox', e.chat)
         })
+
+      setInterval(() => {
+        axios.post('/api/users/online')
+      }, 10000)
     }
   }
 </script>

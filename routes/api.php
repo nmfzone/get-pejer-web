@@ -16,9 +16,20 @@ Route::namespace('Api')->group(function () {
     Route::post('/refresh-token', 'Auth\LoginController@refreshToken');
 
     Route::middleware('auth:api')->group(function () {
-        Route::get('/chats/conversations', 'Chat\UserChatsController@index');
-        Route::get('/chats/{receivableType}/{receivable}', 'Chat\UserChatsController@withReceivable');
-        Route::resource('/chats', 'Chat\ChatsController')->only('store');
-        Route::get('/user', 'User\CurrentUserController@show');
+        Route::namespace('Chat')->group(function () {
+            Route::get('/chats/conversations', 'UserChatsController@index');
+            Route::get('/chats/{receivableType}/{receivable}', 'UserChatsController@withReceivable');
+            Route::resource('/chats', 'ChatsController')->only('store');
+        });
+
+        Route::namespace('User')->group(function () {
+            Route::get('/user', 'CurrentUserController@show');
+            Route::resource('/users', 'UsersController')->only('show');
+            Route::post('/users/online', 'UsersController@storeOnlineStatus');
+        });
+
+        Route::namespace('Group')->group(function () {
+            Route::resource('/groups', 'GroupsController')->only('show');
+        });
     });
 });

@@ -30,3 +30,7 @@ Broadcast::channel('chats.users.{senderId}.to.{receiverId}', function ($user, $s
 Broadcast::channel('chats.all.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
+
+Broadcast::channel('users.online.{id}', function ($user, $id) {
+    return true;
+});

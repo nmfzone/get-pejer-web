@@ -3,6 +3,10 @@
     <div class="back-btn btn btn-primary" @click="back">
       <i class="fa fa-arrow-left"></i> Kembali
     </div>
+    <div class="opponent-name">
+      {{ opponent.name }}
+      <div class="online-indicator" v-if="isOpponentOnline">Online</div>
+    </div>
     <div class="chat-list" ref="chatList">
       <template v-if="error">
         <div class="notice error-chat">
@@ -58,16 +62,23 @@
     },
     data() {
       return {
+        opponent: {},
         chats: [],
         loading: true,
         error: false,
         formDisabled: false,
+        isOpponentOnline: false,
+        offlineListenerInterval: null,
         authUser: window.App.user
       }
     },
     async mounted() {
       try {
-        const response = (await axios.get(`/api/chats/${this.opponentType}/${this.opponentId}`))
+        let response = (await axios.get(`/api/${this.opponentType}/${this.opponentId}`))
+        this.opponent = _.get(response, 'data.data')
+        console.log('Opponent', this.opponent)
+
+        response = (await axios.get(`/api/chats/${this.opponentType}/${this.opponentId}`))
 
         const chats = _.get(response, 'data.data')
 
@@ -77,6 +88,7 @@
 
         let echo = null
 
+        // Chats Listener
         if (this.opponentType === 'users') {
           echo = Echo.private(`chats.users.${this.authUser.id}.to.${this.opponentId}`)
         } else if (this.opponentType === 'groups') {
@@ -89,6 +101,13 @@
           this.pushChat(e.chat)
         })
 
+        // Online Status Listener
+        Echo.channel(`users.online.${this.opponentId}`)
+          .listen('UserOnline', (e) => {
+            this.isOpponentOnline = true
+            this.listenOfflineStatus()
+          })
+
         this.scrollToBottom()
         window.addEventListener('keydown', this.onKeyDown)
         this.loading = false
@@ -100,7 +119,19 @@
         throw e
       }
     },
+    destroyed() {
+      if (this.offlineListenerInterval) {
+        clearInterval(this.offlineListenerInterval)
+      }
+    },
     methods: {
+      listenOfflineStatus() {
+        if (this.isOpponentOnline) {
+          this.offlineListenerInterval = setInterval(() => {
+            this.isOpponentOnline = false
+          }, 20000)
+        }
+      },
       pushChat(data) {
         this.chats.push(data)
         this.scrollToBottom()
@@ -158,6 +189,16 @@
   .back-btn {
     cursor: pointer;
     margin-bottom: 20px;
+  }
+  .opponent-name {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 20px;
+
+    .online-indicator {
+      font-size: 13px;
+      color: #3cab64;
+    }
   }
   .chat-list {
     height: 500px;

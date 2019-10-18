@@ -12,6 +12,7 @@ import Qs from 'qs'
 
 
 window.$ = window.jQuery = Jquery
+require('bootstrap')
 
 window.Vue = Vue
 
