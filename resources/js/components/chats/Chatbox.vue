@@ -3,46 +3,48 @@
     <div class="back-btn btn btn-primary" @click="back">
       <i class="fa fa-arrow-left"></i> Kembali
     </div>
-    <div class="opponent-name">
-      {{ opponent.name }}
-      <div class="online-indicator" v-if="isOpponentOnline">Online</div>
-    </div>
-    <div class="chat-list" ref="chatList">
-      <template v-if="error">
-        <div class="notice error-chat">
-          Terdapat kesalahan! Tidak bisa menampilkan chat.
-        </div>
-      </template>
-      <template v-if="chats.length === 0 && !loading && !error">
-        <div class="notice empty-chat">
-          Mulai sebuah percakapan
-        </div>
-      </template>
-      <template v-for="chat in chats">
-        <div class="date-separator" v-if="showDateSeparator(chat)">
-          <div class="content">
-            {{ formatDateSeparator(chat) }}
+    <template v-if="!loading">
+      <div class="opponent-name">
+        {{ opponent.name }}
+        <div class="online-indicator" v-if="isOpponentOnline">Online</div>
+      </div>
+      <div class="chat-list" ref="chatList">
+        <template v-if="error">
+          <div class="notice error-chat">
+            Terdapat kesalahan! Tidak bisa menampilkan chat.
           </div>
-        </div>
-        <div :key="chat.id" :class="[`chat-${chat.id}`, 'chat']">
-          <div :class="['chat-inner', chat.sender_id === authUser.id ? 'current-user' : '']">
-            <div class="chat-detail">
-              <b class="chat-name">{{ formatChatName(chat) }}</b>
-
-              <div class="chat-date pull-right">
-                {{ moment(chat.created_at).format('HH:mm') }}
-              </div>
+        </template>
+        <template v-if="chats.length === 0 && !error">
+          <div class="notice empty-chat">
+            Mulai sebuah percakapan
+          </div>
+        </template>
+        <template v-for="chat in chats">
+          <div class="date-separator" v-if="showDateSeparator(chat)">
+            <div class="content">
+              {{ formatDateSeparator(chat) }}
             </div>
-            <div class="chat-content" v-html="formatChatContent(chat.message)"></div>
           </div>
-        </div>
-      </template>
-    </div>
-    <chat-form
-      @chat-created="pushChat"
-      :receiver-id="opponentId"
-      :receiver-type="opponentType"
-      :disabled="formDisabled" />
+          <div :key="chat.id" :class="[`chat-${chat.id}`, 'chat']">
+            <div :class="['chat-inner', chat.sender_id === authUser.id ? 'current-user' : '']">
+              <div class="chat-detail">
+                <b class="chat-name">{{ formatChatName(chat) }}</b>
+
+                <div class="chat-date pull-right">
+                  {{ moment(chat.created_at).format('HH:mm') }}
+                </div>
+              </div>
+              <div class="chat-content" v-html="formatChatContent(chat.message)"></div>
+            </div>
+          </div>
+        </template>
+      </div>
+      <chat-form
+        @chat-created="pushChat"
+        :receiver-id="opponentId"
+        :receiver-type="opponentType"
+        :disabled="formDisabled" />
+    </template>
   </div>
 </template>
 
@@ -76,7 +78,6 @@
       try {
         let response = (await axios.get(`/api/${this.opponentType}/${this.opponentId}`))
         this.opponent = _.get(response, 'data.data')
-        console.log('Opponent', this.opponent)
 
         response = (await axios.get(`/api/chats/${this.opponentType}/${this.opponentId}`))
 
@@ -129,7 +130,7 @@
         if (this.isOpponentOnline) {
           this.offlineListenerInterval = setInterval(() => {
             this.isOpponentOnline = false
-          }, 20000)
+          }, 9999)
         }
       },
       pushChat(data) {
