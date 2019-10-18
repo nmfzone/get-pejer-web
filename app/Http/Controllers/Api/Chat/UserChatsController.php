@@ -28,13 +28,13 @@ class UserChatsController extends Controller
             ->fromSub(function (QueryBuilder $query) use ($user) {
                 return $query->rawQuery(
                     Chat::query()
-                        ->selectRaw('receivable_id, receivable_type, max(id) as max_id')
+                        ->selectRaw('id, receivable_id, receivable_type')
                         ->recentEachGroup($user, ['sender_id', 'receivable_id'])
-                        ->groupBy(['receivable_id', 'receivable_type'])
+                        ->groupBy(['id', 'receivable_id', 'receivable_type']) // not sure why
                         ->toRawSql()
                 );
             }, 'grouped_chats')
-            ->join('chats', 'grouped_chats.max_id', '=', 'chats.id')
+            ->join('chats', 'grouped_chats.id', '=', 'chats.id')
             ->with('sender', 'receivable')
             ->latest()
             ->orderByDesc('chats.id');
